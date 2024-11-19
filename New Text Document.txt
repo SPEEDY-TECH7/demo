@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_LINES 100
+#define MAX_LINE_LENGTH 100
+
+void generate_machine_code(const char intermediate_code[MAX_LINES][MAX_LINE_LENGTH], int line_count) {
+    char machine_code[MAX_LINES][MAX_LINE_LENGTH];
+    int code_index = 0;
+
+    for (int i = 0; i < line_count; i++) {
+        char op[10], arg1[10], arg2[10], result[10];
+
+        int num_fields = sscanf(intermediate_code[i], "%s %s %s %s", result, op, arg1, arg2);
+
+        if (num_fields == 4) {
+            if (strcmp(op, "+") == 0) {
+                sprintf(machine_code[code_index++], "LOAD %s", arg1);
+                sprintf(machine_code[code_index++], "ADD %s", arg2);
+                sprintf(machine_code[code_index++], "STORE %s", result);
+            } else if (strcmp(op, "-") == 0) {
+                sprintf(machine_code[code_index++], "LOAD %s", arg1);
+                sprintf(machine_code[code_index++], "SUB %s", arg2);
+                sprintf(machine_code[code_index++], "STORE %s", result);
+            } else if (strcmp(op, "*") == 0) {
+                sprintf(machine_code[code_index++], "LOAD %s", arg1);
+                sprintf(machine_code[code_index++], "MUL %s", arg2);
+                sprintf(machine_code[code_index++], "STORE %s", result);
+            } else if (strcmp(op, "/") == 0) {
+                sprintf(machine_code[code_index++], "LOAD %s", arg1);
+                sprintf(machine_code[code_index++], "DIV %s", arg2);
+                sprintf(machine_code[code_index++], "STORE %s", result);
+            } else {
+                printf("Unsupported operation: %s\n", op);
+                exit(EXIT_FAILURE);
+            }
+        } else if (num_fields == 3) {
+            if (strcmp(op, "=") == 0) {
+                sprintf(machine_code[code_index++], "LOAD %s", arg1);
+                sprintf(machine_code[code_index++], "STORE %s", result);
+            } else {
+                printf("Unsupported operation: %s\n", op);
+                exit(EXIT_FAILURE);
+            }
+        } else {
+            printf("Invalid intermediate code format: %s\n", intermediate_code[i]);
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // Print the generated machine code
+    printf("Generated Machine Code:\n");
+    for (int i = 0; i < code_index; i++) {
+        printf("%s\n", machine_code[i]);
+    }
+}
+
+int main() {
+    const char intermediate_code[MAX_LINES][MAX_LINE_LENGTH] = {
+        "T1 = a + b",
+        "T2 = T1 * c",
+        "T3 = T2 - d",
+        "e = T3"
+    };
+
+    int line_count = 4;
+
+    generate_machine_code(intermediate_code, line_count);
+
+    return 0;
+}
